@@ -1,3 +1,14 @@
+# modified usage
+Edit the "config.sample" file  with your variables and save as config
+run lidarr-smloadr2.sh
+
+# what changed
+Added a config file
+Added a way to grab albums marked as wanted in lidarr instead of everything by an artist. Change mode=wanted in config to use it, change mode=artist to use the old method
+Removed dependency on python
+
+The powershell version remains unchanged
+
 # lidarr-smloadr-script 
 Bash & powershell scripts to download artists in lidarr using smloadr.
 
