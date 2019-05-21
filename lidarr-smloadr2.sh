@@ -58,7 +58,7 @@ ProcessAlbumsLidarrReq(){
 QueryAlbumURL(){
 	##retrieve all albums for artist -- from deezer
 	searchQuery="https://api.deezer.com/artist/${DeezerArtistID}/albums&limit=1000"
-	DeezerDiscog=$(curl -s "${searchQuery}"| jq -r);
+	DeezerDiscog=$(curl -s "${searchQuery}"| jq -r .);
 	DeezerDiscogTotal=$(echo "${DeezerDiscog}" |jq -r '.total')
 	##match the wanted album title -- from deezer
 	for ((x=0;x<=DeezerDiscogTotal-1;x++)); do
