@@ -38,6 +38,9 @@ ProcessArtistsLidarrReq(){
 AlbumsLidarrReq(){
 	wantit=$(curl -s --header "X-Api-Key:"${lidarrApiKey} --request GET  "$lidarrUrl/api/v1/wanted/missing/?page=1&pagesize=${wantedalbumsamount}&includeArtist=true&monitored=true&sortDir=desc&sortKey=releaseDate")
 }
+GetTotalAlbumsLidarrReq(){
+	TotalLidAlbumsNames=$(echo "${wantit}"|jq -r '.records[].title' |wc -l  )
+}
 
 ProcessAlbumsLidarrReq(){
 	LidArtistName=$(echo "${wantit}" | jq -r .records[${i}].artist.sortName)
@@ -104,8 +107,9 @@ InitLogs(){
 
 WantedModeBegin(){
 	AlbumsLidarrReq
-	let loopindex=wantedalbumsamount-1
-	logit "Going to process and download ${wantedalbumsamount} records"
+	GetTotalAlbumsLidarrReq
+	let loopindex=TotalLidAlbumsNames-1
+	logit "Going to process and download ${TotalLidAlbumsNames} records"
 	for ((i=0;i<=(loopindex);i++)); do
 			logit ""
 			LidArtistName=""
