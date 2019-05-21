@@ -44,6 +44,7 @@ GetTotalAlbumsLidarrReq(){
 
 ProcessAlbumsLidarrReq(){
 	LidArtistName=$(echo "${wantit}" | jq -r .records[${i}].artist.sortName)
+	LidArtistDLName=$(echo "${wantit}" | jq -r .records[${i}].artist.artistName)
 	LidAlbumName=$(echo "${wantit}" | jq -r .records[${i}].title)
 	#M1 -- retrieve deezer artist id -- from lidarr
 	DeezerArtistURL=$(echo "${wantit}" | jq -r .records[${i}].artist.links[] |jq -r 'select(.name=="deezer")|.url');
@@ -63,14 +64,15 @@ QueryAlbumURL(){
 	searchQuery="https://api.deezer.com/artist/${DeezerArtistID}/albums&limit=1000"
 	DeezerDiscog=$(curl -s "${searchQuery}"| jq -r .);
 	DeezerDiscogTotal=$(echo "${DeezerDiscog}" |jq -r '.total')
+	mapfile -t DeezerDiscogArr <<< $(echo ${DeezerDiscog}|jq -c '.[][]?.title')
 	##match the wanted album title -- from deezer
 	for ((x=0;x<=DeezerDiscogTotal-1;x++)); do
 		DeezerDiscogAlbumName=$(echo "${DeezerDiscog}" |jq ".[]|.[$x]?"|jq -r .title )
 		if [ "${LidAlbumName,,}" = "${DeezerDiscogAlbumName,,}" ];then
 			DeezerAlbumURL=$(echo "${DeezerDiscog}" |jq ".[]|.[$x]?"|jq -r .link )
 			break
-	fi
-done
+		fi
+	done
 ##returns wanted album URL -- from deezer
 }
 
@@ -113,6 +115,7 @@ WantedModeBegin(){
 	for ((i=0;i<=(loopindex);i++)); do
 			logit ""
 			LidArtistName=""
+			LidArtistDLName=""
 			DeezerArtistID=""
 			DeezerArtistURL=""
 			LidAlbumName=""
@@ -141,8 +144,15 @@ WantedModeBegin(){
 			DownloadURL "${DeezerAlbumURL}"
 		else
 			logit "Cant match the wanted album to an album on deezer .. skipping" 
-			skiplog "${LidArtistName};${DeezerArtistID};${DeezerArtistURL};${LidAlbumName};${DeezerDiscog}"
+			skiplog "${LidArtistName};${DeezerArtistID};${DeezerArtistURL};${LidAlbumName};${DeezerDiscogArr[*]}"
 			continue
+		fi
+		if [ "${EnableLidarrProcess}" = True ] && [ -n "${LidArtistDLName}" ];then
+				logit "Sending to Lidarr for post Processing"
+				dlloc="${downloadDir}/${LidArtistDLName}/"
+				LidarrProcessIt=$(curl -s "$lidarrUrl/api/v1/command" --header "X-Api-Key:"${lidarrApiKey} --data '{"name":"DownloadedAlbumsScan", "path":"'"$dlloc"'"}' );
+		else
+			logit "Skipping Lidarr Processing"
 		fi
 	done
 }
