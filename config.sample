@@ -21,3 +21,5 @@ wantedalbumsamount=10
 logname=lodarr-smloadr-script2.log
 ##logs any info if an item was skipped
 skiplogname=skipped.csv
+##set to True to instruct Lidarr to process the download once smloadr finishes
+EnableLidarrProcess=True
