@@ -23,3 +23,5 @@ logname=lodarr-smloadr-script2.log
 skiplogname=skipped.csv
 ##set to True to instruct Lidarr to process the download once smloadr finishes
 EnableLidarrProcess=True
+##set to True to enable fuzzy album search if theres no exact match
+EnableFuzzyAlbumSearch=True
