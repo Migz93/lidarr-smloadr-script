@@ -199,6 +199,17 @@ ArtistModeBegin(){
 		if [ -n "${DeezerArtistID}" ] || [ -n "${LidArtistName}" ] || [ -n "${DeezerArtistURL}" ]; then
 			DownloadURL "${DeezerArtistURL}"
 			logit "DeezerArtistURL: ${DeezerArtistURL}"
+			
+			if [ "${EnableLidarrProcess}" = True ];then
+				logit "Sending to Lidarr for post Processing"
+				dlloc=${downloadDir}/*
+				for d in $dlloc; do
+					LidarrProcessIt=$(curl -s "$lidarrUrl/api/v1/command" --header "X-Api-Key:"${lidarrApiKey} --data '{"name":"DownloadedAlbumsScan", "path":"'"$d"'"}' );
+				done
+			else
+			logit "Skipping Lidarr Processing"
+			fi
+			
 		else
 			logit "Cant get artistname or or DeezerArtistURL or artistid.. skipping" 
 			skiplog "${LidArtistName};${DeezerArtistID};${DeezerArtistURL};${LidAlbumName}"
