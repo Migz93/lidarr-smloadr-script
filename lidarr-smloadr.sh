@@ -163,7 +163,7 @@ WantedModeBegin(){
 		fi
 		if [ "${EnableLidarrProcess}" = True ] && [ -n "${LidArtistDLName}" ];then
 				logit "Sending to Lidarr for post Processing"
-				dlloc="${downloadDir}/*
+				dlloc=${downloadDir}/*
 				for d in $dlloc; do
 					LidarrProcessIt=$(curl -s "$lidarrUrl/api/v1/command" --header "X-Api-Key:"${lidarrApiKey} --data '{"name":"DownloadedAlbumsScan", "path":"'"$d"'"}' );
 				done
