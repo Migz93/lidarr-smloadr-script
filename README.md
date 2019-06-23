@@ -34,10 +34,10 @@ Edit the "config.sample" file, fill your paramaters and save as "config".<br>
 * logname -					Log file name.<br>
 * skiplogname -				Logs any info if an item was skipped.<br>
 * mode -					Mode to choose what to scrape from Lidarr, wanted gets only the albums that are marked wanted, artist gets all the albums from the monitored artists.<br>
+* EnableLidarrProcess -		Set to True to instruct Lidarr to process the download once smloadr finishes.<br>
 
 Below are only used if "mode" is set to "wanted".<br>
 * wantedalbumsamount -		The amount of wanted albums to process it will grab the newest x amount of albums from the Lidarr wanted list.<br>
-* EnableLidarrProcess -		Set to True to instruct Lidarr to process the download once smloadr finishes.<br>
 * EnableFuzzyAlbumSearch -	Set to True to enable fuzzy album search if theres no exact match.<br>
 
 # Requirements
