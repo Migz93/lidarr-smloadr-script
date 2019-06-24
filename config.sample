@@ -20,6 +20,10 @@ skiplogname=skipped.csv
 CannotImport=False
 #When set to True, smloadr downloads directory contents is purged on initialization
 CleanStart=False
+#When set to True, you will enable the downloaded files to be moved and picked up by other applications/scripts that you have setup. This replaces scripts Lidarr import process.
+ExternalProcess=False
+#Directory that you want to move downloaded files to for processing with other scripts or applications such as Beets
+externalprocessdirectory=/opt/beets/import
 #mode to choose what to passthrough to smloadr, "wanted" gets only the albums that are marked as monitored in lidarr, "artist" will just passthrough the artist. (wanted,artist) 
 mode=wanted
 #set to True to instruct Lidarr to process the download once smloadr finishes
