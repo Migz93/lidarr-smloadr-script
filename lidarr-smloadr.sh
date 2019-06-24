@@ -110,10 +110,10 @@ Cleanup(){
 	if [ "${KeepOnly}" = True ];then
 		if [ "${quality}" = FLAC ];then
 			logit "Removing unwanted MP3's"
-			find ${downloadDir}/. -name "*.mp3" -type f -delete
+			find ${downloadDir}/. -type f -name "*.mp3" -delete
 		else
 			logit "Removing unwanted FLAC's"
-			find ${downloadDir}/. -type f -name "*.flac" -type f -delete
+			find ${downloadDir}/. -type f -name "*.flac" -delete
 		fi
 	else
 		logit "Skipping KeepOnly Quality Cleanup"
@@ -125,6 +125,18 @@ Cleanup(){
 		find ${downloadDir}/ -empty -type d -delete
 	else
 		logit "Skipping Unwanted file removal"
+	fi
+}
+
+ExternalProcess(){
+	if [ "${ExternalProcess}" = True ];then
+		dlloc=${downloadDir}/*
+		for d in $dlloc; do
+			logit "Moving Downloads"
+			mv "$d" ${externalprocessdirectory}
+		done
+	else
+		logit "Skipping External Processing"
 	fi
 }
 
@@ -191,6 +203,7 @@ WantedModeBegin(){
 			continue
 		fi
 		Cleanup
+		ExternalProcess
 		if [ "${EnableLidarrProcess}" = True ] && [ -n "${LidArtistDLName}" ];then
 				logit "Sending to Lidarr for post Processing"
 				dlloc=${downloadDir}/*
@@ -236,6 +249,7 @@ ArtistModeBegin(){
 		fi
 	done
 	Cleanup
+	ExternalProcess
 	if [ "${EnableLidarrProcess}" = True ];then
 		logit "Sending to Lidarr for post Processing"
 		dlloc=${downloadDir}/*
