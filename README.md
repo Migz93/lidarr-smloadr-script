@@ -31,8 +31,11 @@ Edit the "config.sample" file, fill your paramaters and save as "config".<br>
 * LidarrUrl - 				Set domain or IP to your Lidarr instance including port. If using reverse proxy, do not use a trailing slash.<br>
 * LidarrApikey - 			Lidarr api key.<br>
 * quality - 				SMLoadr Download Quality setting (MP3_128,MP3_320,FLAC).<br>
+* KeepOnly -					Keeps only the requested Download Quality<br>
 * logname -					Log file name.<br>
 * skiplogname -				Logs any info if an item was skipped.<br>
+* CannotImport -				Removes files that cannot be imported by Lidarr automatically (.jpg, .lrc).<br>
+* CleanStart -				Purges files from SMLoadr Download directory at start of script<br>
 * mode -					Mode to choose what to scrape from Lidarr, wanted gets only the albums that are marked wanted, artist gets all the albums from the monitored artists.<br>
 * EnableLidarrProcess -		Set to True to instruct Lidarr to process the download once smloadr finishes.<br>
 
