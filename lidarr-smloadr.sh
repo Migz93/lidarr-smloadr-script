@@ -22,7 +22,7 @@ ProcessArtistsLidarrReq(){
 			DeezerArtistID=$(echo "${DeezerSearch}" |jq -r ".data | .[]|.artist|.id" |uniq -c|sort -nr |head -n1 | awk '{print $2}')
 			DeezerArtistURL="https://www.deezer.com/artist/"${DeezerArtistID}
 		fi
-	else 
+	else
 		if [ "${DeezerArtistURL}" = "" ] || [ "${DeezerArtistID}" = "" ]; then
 			##M3 fallback -- retrieve deezer artist id using last album-- from deezer
 			searchQuery="${LidArtistName// /%20}%20${LidAlbumName// /%20}"
@@ -93,7 +93,7 @@ QueryAlbumURL(){
 DownloadURL(){
 	logit "Starting Download ... "
 	DLURL=${1}
-	./SMLoadr-linux-x64 -q ${quality} -p "${downloadDir}" "${DLURL}" 
+	./SMLoadr-linux-x64 -q ${quality} -p "${downloadDir}" "${DLURL}"
 	logit "Download Complete"
 }
 
@@ -201,7 +201,7 @@ WantedModeBegin(){
 		if [ -n "${DeezerAlbumURL}" ]; then
 			DownloadURL "${DeezerAlbumURL}"
 		else
-			logit "Cant match the wanted album to an album on deezer .. skipping" 
+			logit "Cant match the wanted album to an album on deezer .. skipping"
 			skiplog "${LidArtistName};${DeezerArtistID};${DeezerArtistURL};${LidAlbumName};${DeezerDiscogArr[*]}"
 			continue
 		fi
@@ -211,9 +211,13 @@ WantedModeBegin(){
 		else
 			if [ "${EnableLidarrProcess}" = True ];then
 					logit "Sending to Lidarr for post Processing"
-					dlloc=${downloadDir}/*
-					for d in $dlloc; do
-						LidarrProcessIt=$(curl -s "$lidarrUrl/api/v1/command" --header "X-Api-Key:"${lidarrApiKey} --data '{"name":"DownloadedAlbumsScan", "path":"'"$d"'"}' );
+					for d in "${dlloc[@]}"; do
+					if [ "${EnableWSLmode}" = True ];then
+						dwrap=($( echo "${d}"|sed -e 's/mnt\///' -e 's/^\///' -e 's/^./\0:/' -e 's/\//\\\\/g' -e 's/^/\"/g' -e 's/$/\"/g'))
+					else
+						dwrap=($( echo "${d}"|sed -e 's/^/\"/g' -e 's/$/\"/g'))
+					fi
+						LidarrProcessIt=$(curl -s "$lidarrUrl/api/v1/command" --header "X-Api-Key:"${lidarrApiKey} --data '{"name":"DownloadedAlbumsScan", "path":'"${dwrap}"'}' );
 					done
 			else
 				logit "Skipping Lidarr Processing"
@@ -247,9 +251,9 @@ ArtistModeBegin(){
 		echo "-Querying"
 		if [ -n "${DeezerArtistID}" ] || [ -n "${LidArtistName}" ] || [ -n "${DeezerArtistURL}" ]; then
 			DownloadURL "${DeezerArtistURL}"
-			logit "DeezerArtistURL: ${DeezerArtistURL}"			
+			logit "DeezerArtistURL: ${DeezerArtistURL}"
 		else
-			logit "Cant get artistname or or DeezerArtistURL or artistid.. skipping" 
+			logit "Cant get artistname or or DeezerArtistURL or artistid.. skipping"
 			skiplog "${LidArtistName};${DeezerArtistID};${DeezerArtistURL};${LidAlbumName}"
 			continue
 		fi
@@ -260,10 +264,14 @@ ArtistModeBegin(){
 	else
 		if [ "${EnableLidarrProcess}" = True ];then
 			logit "Sending to Lidarr for post Processing"
-			dlloc=${downloadDir}/*
-			for d in $dlloc; do
-				LidarrProcessIt=$(curl -s "$lidarrUrl/api/v1/command" --header "X-Api-Key:"${lidarrApiKey} --data '{"name":"DownloadedAlbumsScan", "path":"'"$d"'"}' );
-			done
+			for d in "${dlloc[@]}"; do
+				if [ "${EnableWSLmode}" = True ];then
+					dwrap=($( echo "${d}"|sed -e 's/mnt\///' -e 's/^\///' -e 's/^./\0:/' -e 's/\//\\\\/g' -e 's/^/\"/g' -e 's/$/\"/g'))
+				else
+					dwrap=($( echo "${d}"|sed -e 's/^/\"/g' -e 's/$/\"/g'))
+				fi
+					LidarrProcessIt=$(curl -s "$lidarrUrl/api/v1/command" --header "X-Api-Key:"${lidarrApiKey} --data '{"name":"DownloadedAlbumsScan", "path":'"${dwrap}"'}' );
+				done
 		else
 				logit "Skipping Lidarr Processing"
 		fi
@@ -275,7 +283,7 @@ main(){
 	source ./config || ErrorExit "Configuration file not found" 2
 	InitLogs
 	CleanStart
-	case "${mode}" in 
+	case "${mode}" in
 		wanted)	WantedModeBegin;;
 		artist) ArtistModeBegin;;
 		*) logit "mode error, check mode variable in config valid = wanted/artist" ;;
