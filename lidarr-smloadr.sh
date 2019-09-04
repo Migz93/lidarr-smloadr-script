@@ -168,6 +168,7 @@ WantedModeBegin(){
 	AlbumsLidarrReq
 	GetTotalAlbumsLidarrReq
 	let loopindex=TotalLidAlbumsNames-1
+	[ ${loopindex} = "-1" ] && ErrorExit "Lidarr communication error, check lidarrUrl in config or lidarrApiKey"
 	logit "Going to process and download ${TotalLidAlbumsNames} records"
 	for ((i=0;i<=(loopindex);i++)); do
 			logit ""
@@ -230,6 +231,7 @@ ArtistModeBegin(){
 	ArtistsLidarrReq
 	GetTotalArtistsLidarrReq
 	let loopindex=TotalLidArtistNames-1
+	[ ${loopindex} = "-1" ] && ErrorExit "Lidarr communication error, check lidarrUrl in config or lidarrApiKey"
 	logit "Going to process and download ${TotalLidArtistNames} records"
 	for ((i=0;i<=(loopindex);i++)); do
 		logit ""
