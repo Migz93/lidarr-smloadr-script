@@ -16,19 +16,13 @@ ProcessArtistsLidarrReq(){
 		if [ "${DeezerArtistURL}" = "" ] || [ "${DeezerArtistID}" = "" ]; then
 			##M2 fallback -- retrieve deezer artist id -- from deezer
 			#Encode searchQuery in a url encodable format.
-			searchQuery="${LidArtistName// /%20}"
-			searchQuery="https://api.deezer.com/search?q=${searchQuery}"
-			DeezerSearch=$(curl -s "${searchQuery}" | jq )
-			DeezerArtistID=$(echo "${DeezerSearch}" |jq -r ".data | .[]|.artist|.id" |uniq -c|sort -nr |head -n1 | awk '{print $2}')
+			DeezerArtistID=$(curl -s --GET --data-urlencode q="${LidArtistName}" "https://api.deezer.com/search" | jq -r ".data | .[]|.artist|.id" |uniq -c|sort -nr |head -n1 | awk '{print $2}')
 			DeezerArtistURL="https://www.deezer.com/artist/"${DeezerArtistID}
 		fi
 	else
 		if [ "${DeezerArtistURL}" = "" ] || [ "${DeezerArtistID}" = "" ]; then
 			##M3 fallback -- retrieve deezer artist id using last album-- from deezer
-			searchQuery="${LidArtistName// /%20}%20${LidAlbumName// /%20}"
-			searchQuery="https://api.deezer.com/search?q=${searchQuery}"
-			DeezerSearch=$(curl -s "${searchQuery}" | jq )
-			DeezerArtistID=$(echo "${DeezerSearch}" | jq -r ".data | .[]|.artist|.id" |uniq -c|sort -nr |head -n1 | awk '{print $2}')
+			DeezerArtistID=$(curl -s --GET --data-urlencode q="${LidArtistName} ${LidAlbumName}" "https://api.deezer.com/search" | jq -r ".data | .[]|.artist|.id" |uniq -c|sort -nr |head -n1 | awk '{print $2}')
 			DeezerArtistURL="https://www.deezer.com/artist/"${DeezerArtistID}
 		fi
 	fi
@@ -52,9 +46,7 @@ ProcessAlbumsLidarrReq(){
 	if [ "${DeezerArtistURL}" = "" ] || [ "${DeezerArtistID}" = "" ]; then
 		##M2 fallback -- retrieve deezer artist id -- from deezer
 		#Encode searchQuery in a url encodable format.
-		searchQuery="${LidArtistName// /%20}"
-		searchQuery="https://api.deezer.com/search?q=${searchQuery}"
-		DeezerArtistID=$(curl -s "${searchQuery}" | jq -r ".data | .[]|.artist|.id" |uniq -c|sort -nr |head -n1 | awk '{print $2}')
+		DeezerArtistID=$(curl -s --GET --data-urlencode q="${LidArtistName}" "https://api.deezer.com/search" | jq -r ".data | .[]|.artist|.id" |uniq -c|sort -nr |head -n1 | awk '{print $2}')
 	fi
 ##returns the wanted artists id -- from lidarr or deezer
 }
@@ -180,7 +172,7 @@ WantedModeBegin(){
 			DeezerDiscogAlbumName=""
 			DeezerAlbumURL=""
 			DeezerAlbumID=""
-		echo "-Processing"
+		echo "-Processing ${i} of ${loopindex}"
 		if [ -n "${wantit}" ]; then
 			ProcessAlbumsLidarrReq
 			logit "ArtistName: ${LidArtistName}"
@@ -189,7 +181,7 @@ WantedModeBegin(){
 		else
 			ErrorExit "Lidarr communication error, check lidarrUrl in config or lidarrApiKey"
 		fi
-		echo "-Querying"
+		echo "-Querying ${i} of ${loopindex}"
 		if [ -n "${DeezerArtistID}" ] || [ -n "${LidArtistName}" ] || [ -n "${LidAlbumName}" ]; then
 			QueryAlbumURL
 			logit "DeezerAlbumName: ${DeezerDiscogAlbumName}"
@@ -212,6 +204,7 @@ WantedModeBegin(){
 		else
 			if [ "${EnableLidarrProcess}" = True ];then
 					logit "Sending to Lidarr for post Processing"
+					dlloc=($(find "${downloadDir}" -maxdepth 1 -type d -not -path "${downloadDir}"))
 					for d in "${dlloc[@]}"; do
 					if [ "${EnableWSLmode}" = True ];then
 						dwrap=($( echo "${d}"|sed -e 's/mnt\///' -e 's/^\///' -e 's/^./\0:/' -e 's/\//\\\\/g' -e 's/^/\"/g' -e 's/$/\"/g'))
@@ -241,7 +234,7 @@ ArtistModeBegin(){
 		LidAlbumName=""
 		DeezerDiscogAlbumName=""
 		DeezerAlbumURL=""
-		echo "-Processing"
+		echo "-Processing ${i} of ${loopindex}"
 		if [ -n "${wantit}" ]; then
 			ProcessArtistsLidarrReq
 			logit "ArtistName: ${LidArtistName}"
@@ -250,8 +243,13 @@ ArtistModeBegin(){
 		else
 			ErrorExit "Lidarr communication error, check lidarrUrl in config or lidarrApiKey"
 		fi
-		echo "-Querying"
+		echo "-Querying ${i} of ${loopindex}"
 		if [ -n "${DeezerArtistID}" ] || [ -n "${LidArtistName}" ] || [ -n "${DeezerArtistURL}" ]; then
+			if [ ${DeezerArtistURL} = "https://www.deezer.com/artist/" ];then
+				logit "Cant get DeezerArtistURL or artistid.. skipping"
+				skiplog "${LidArtistName};${DeezerArtistID};${DeezerArtistURL};${LidAlbumName}"
+				continue
+			fi
 			DownloadURL "${DeezerArtistURL}"
 			logit "DeezerArtistURL: ${DeezerArtistURL}"
 		else
@@ -266,6 +264,7 @@ ArtistModeBegin(){
 	else
 		if [ "${EnableLidarrProcess}" = True ];then
 			logit "Sending to Lidarr for post Processing"
+			dlloc=($(find "${downloadDir}" -maxdepth 1 -type d -not -path "${downloadDir}"))
 			for d in "${dlloc[@]}"; do
 				if [ "${EnableWSLmode}" = True ];then
 					dwrap=($( echo "${d}"|sed -e 's/mnt\///' -e 's/^\///' -e 's/^./\0:/' -e 's/\//\\\\/g' -e 's/^/\"/g' -e 's/$/\"/g'))
@@ -280,16 +279,28 @@ ArtistModeBegin(){
 	fi
 }
 
+CheckdlPath(){
+if [ -d ${downloadDir} ] && [ -w ${downloadDir} ]; then
+	dlcontento=($(find "${downloadDir}" -maxdepth 1 -type d -not -path "${downloadDir}"))
+else
+	ErrorExit "download directory not writeable or doesnt exist ${downloadDir}"
+fi
+}
+
 main(){
+	OLDIFS=$IFS
+	IFS=$'\n'
 	echo "Starting up"
 	source ./config || ErrorExit "Configuration file not found" 2
 	InitLogs
 	CleanStart
+	CheckdlPath
 	case "${mode}" in
 		wanted)	WantedModeBegin;;
 		artist) ArtistModeBegin;;
 		*) logit "mode error, check mode variable in config valid = wanted/artist" ;;
 	esac
+	IFS=$OLDIFS
 }
 
 main ${@}
