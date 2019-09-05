@@ -1,11 +1,11 @@
 ##rename this file to "config" and enter in your parameters
 
 #Directory that you want log files to be stored.
-scriptDir="/opt/smloadr/lidarr"
-#Directory that you want smloadr to download to.
-downloadDir="/mnt/unionfs/Media/Music/"
+scriptDir="/opt/appdata/deezloaderremix/lidarr"
+#Directory that you want deezloaderremix to download to.
+downloadDir="/mnt/unionfs/deez/"
 #Set domain or IP to your lidarr instance including port. If using reverse proxy, do not use a trailing slash. Ensure you specify http/s.
-lidarrUrl="http://192.168.1.x:8686"
+lidarrUrl="http://127.0.0.1:8686"
 #Lidarr api key
 lidarrApiKey="08d108d108d108d108d108d108d108d1"
 #SMLoadr Download Quality setting (MP3_128,MP3_320,FLAC)
@@ -18,14 +18,14 @@ logname=smloadr-script.log
 skiplogname=skipped.csv
 #set to True to delete files and empty folders that cannot be imported by Lidarr ".lrc" & ".jpg" files
 CannotImport=False
-#When set to True, smloadr downloads directory contents is purged on initialization
+#When set to True, deezloaderremix downloads directory contents is purged on initialization
 CleanStart=False
-#mode to choose what to passthrough to smloadr, "wanted" gets only the albums that are marked as monitored in lidarr, "artist" will just passthrough the artist. (wanted,artist) 
+#mode to choose what to passthrough to deezloaderremix, "wanted" gets only the albums that are marked as monitored in lidarr, "artist" will just passthrough the artist. (wanted,artist) 
 mode=wanted
 #When set to True, you will enable the downloaded files to be moved and picked up by other applications/scripts that you have setup. This replaces scripts Lidarr import process.
 ExternalProcess=False
 #Directory that you want to move downloaded files to for processing with other scripts or applications such as Beets
-externalprocessdirectory=/opt/beets/import
+externalprocessdirectory=
 #set to True to instruct Lidarr to process the download once smloadr finishes
 EnableLidarrProcess=True
 
