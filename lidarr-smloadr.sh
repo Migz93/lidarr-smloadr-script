@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ArtistsLidarrReq(){
-	wantit=$(curl -s --header "X-Api-Key:"${LidarrApikey} --request GET  "$LidarrUrl/api/v1/Artist/")
+	wantit=$(curl -s --header "X-Api-Key:"${LidarrApiKey} --request GET  "$LidarrUrl/api/v1/Artist/")
 }
 GetTotalArtistsLidarrReq(){
 	TotalLidArtistNames=$(echo "${wantit}"|jq -r '.[].sortName' |wc -l  )
@@ -30,7 +30,7 @@ ProcessArtistsLidarrReq(){
 }
 
 AlbumsLidarrReq(){
-	wantit=$(curl -s --header "X-Api-Key:"${LidarrApikey} --request GET  "$LidarrUrl/api/v1/wanted/missing/?page=1&pagesize=${WantedAlbumsAmount}&includeArtist=true&monitored=true&sortDir=desc&sortKey=releaseDate")
+	wantit=$(curl -s --header "X-Api-Key:"${LidarrApiKey} --request GET  "$LidarrUrl/api/v1/wanted/missing/?page=1&pagesize=${WantedAlbumsAmount}&includeArtist=true&monitored=true&sortDir=desc&sortKey=releaseDate")
 }
 GetTotalAlbumsLidarrReq(){
 	TotalLidAlbumsNames=$(echo "${wantit}"|jq -r '.records[].title' |wc -l  )
@@ -91,7 +91,7 @@ DownloadURL(){
 
 CleanStart(){
 	if [ "${CleanStart}" = True ];then
-		logit "Removing previously downloaded files form smloadr downloads directory"
+		logit "Removing previously downloaded files from SMLoadr downloads directory".
 		rm -rf ${DownloadDir}/*
 	else
 		logit "Skipping CleanStart"
@@ -129,7 +129,7 @@ LidarrProcess(){
 		else
 			dwrap=($( echo "${d}"|sed -e 's/^/\"/g' -e 's/$/\"/g'))
 		fi
-		LidarrProcessIt=$(curl -s "$LidarrUrl/api/v1/command" --header "X-Api-Key:"${LidarrApikey} --data '{"name":"DownloadedAlbumsScan", "path":'"${dwrap}"'}' );
+		LidarrProcessIt=$(curl -s "$LidarrUrl/api/v1/command" --header "X-Api-Key:"${LidarrApiKey} --data '{"name":"DownloadedAlbumsScan", "path":'"${dwrap}"'}' );
 	done
 	sleep 3s
 }
@@ -170,7 +170,7 @@ WantedModeBegin(){
 	AlbumsLidarrReq
 	GetTotalAlbumsLidarrReq
 	let loopindex=TotalLidAlbumsNames-1
-	[ ${loopindex} = "-1" ] && ErrorExit "Lidarr communication error, check LidarrUrl in config or LidarrApikey"
+	[ ${loopindex} = "-1" ] && ErrorExit "Lidarr communication error, check LidarrUrl in config or LidarrApiKey"
 	logit "Going to process and download ${TotalLidAlbumsNames} records"
 	for ((i=0;i<=(loopindex);i++)); do
 			logit ""
@@ -189,7 +189,7 @@ WantedModeBegin(){
 			logit "LidarrAlbumName: ${LidAlbumName}"
 			logit "ArtistID: ${DeezerArtistID}"
 		else
-			ErrorExit "Lidarr communication error, check LidarrUrl in config or LidarrApikey"
+			ErrorExit "Lidarr communication error, check LidarrUrl in config or LidarrApiKey"
 		fi
 		echo "-Querying ${i} of ${loopindex}"
 		if [ -n "${DeezerArtistID}" ] || [ -n "${LidArtistName}" ] || [ -n "${LidAlbumName}" ]; then
@@ -223,7 +223,7 @@ ArtistModeBegin(){
 	ArtistsLidarrReq
 	GetTotalArtistsLidarrReq
 	let loopindex=TotalLidArtistNames-1
-	[ ${loopindex} = "-1" ] && ErrorExit "Lidarr communication error, check LidarrUrl in config or LidarrApikey"
+	[ ${loopindex} = "-1" ] && ErrorExit "Lidarr communication error, check LidarrUrl in config or LidarrApiKey"
 	logit "Going to process and download ${TotalLidArtistNames} records"
 	for ((i=0;i<=(loopindex);i++)); do
 		logit ""
@@ -240,7 +240,7 @@ ArtistModeBegin(){
 			logit "LidarrAlbumName: ${LidAlbumName}"
 			logit "ArtistID: ${DeezerArtistID}"
 		else
-			ErrorExit "Lidarr communication error, check LidarrUrl in config or LidarrApikey"
+			ErrorExit "Lidarr communication error, check LidarrUrl in config or LidarrApiKey"
 		fi
 		echo "-Querying ${i} of ${loopindex}"
 		if [ -n "${DeezerArtistID}" ] || [ -n "${LidArtistName}" ] || [ -n "${DeezerArtistURL}" ]; then
