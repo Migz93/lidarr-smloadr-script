@@ -49,7 +49,7 @@ Below are only used if "mode" is set to "wanted".<br>
 # Other
 Lidarr collects its information from https://musicbrainz.org which is open to anyone to edit, so if the Deezer ID in Lidarr is incorrect or missing you can sign up for an account and amend/add this yourself. This can take a few days to propagate to Lidarr.
 
-The legacy version of this script that runs in bash & powershell but only grabs everything by an artist is available within [Legacy](Legacy/LEGACY.md) branch.<br>
+The legacy version of this script that runs in bash & powershell but only grabs everything by an artist is available within [Legacy](https://github.com/Migz93/lidarr_smloadr_script/tree/legacy) branch.<br>
 
 # Credit
 Original Script: Myself<br>
